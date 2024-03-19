@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Wire Wizard</title>
+    <style>
+      h2 {
+        width: 500px;
+        text-align: center;
+        margin-top: 20px;
+        margin-bottom: 20px;
+      }
+      
+      .lv_frame {
+        width: 500px;
+        height: 250px;
+        border: 2px solid #ccc;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .lv_btn {
+        display: inline-block;
+        background: linear-gradient(to bottom, #76a2d0 0%, #193a5d 100%);
+        border: 1px solid rgba(11, 25, 40, 0.7);
+        color: #ffffff;
+        padding: 10px 20px;
+        text-align: center;
+        text-decoration: none;
+        font-size: 16px;
+        margin: 4px 2px;
+        cursor: pointer;
+        border-radius: 8px;
+        width: 80px;
+      }
+      
+      .lv_btn:active {
+        background: linear-gradient(to bottom, #336294 0%, #10263c 100%);
+        color: #a4b5c6;
+      }    
+
+      /* Stil für Labels */
+      .lv_label {
+        display: inline-block;
+        width: 90px;
+        text-align: center;
+        margin-top: 10px;
+      }
+
+      /* Stil für Labels */
+      .lv_label_slider {
+        display: inline-block;
+        width: 60px;
+        text-align: left;
+        margin-top: 10px;
+      }
+
+      /* Container für Symmetrie */
+      .lv_container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+      
+      .slider-group {
+        display: flex;
+        align-items: center;
+        gap: 0px;
+      }
+
+      /* Stil für Slider */
+      input[type=range] {
+        -webkit-appearance: none;
+        width: 70%;
+        height: 25px;
+        background: #ddd;
+        border-radius: 10px;
+        outline: none;
+        opacity: 0.7;
+        -webkit-transition: .2s;
+        transition: opacity .2s;
+        margin-top: 10px;
+      }
+        
+      input[type=range]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 25px;
+        height: 25px;
+        background: #4CAF50;
+        cursor: pointer;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Wire Wizard</h2>
+    <div class="lv_frame">
+      <!-- Container für Symmetrie -->
+      <div class="lv_container">
+        <!-- Stepper X Labels -->
+        <div>
+          <label class="lv_label" for="x">Stepper X</label>
+          <button class="lv_btn" name="XLeft" class="lv_btn">Left</button>
+          <button class="lv_btn" name="XRight" class="lv_btn">Right</button>
+        </div>
+
+        <!-- Stepper Y Labels -->
+        <div>
+          <label class="lv_label" for="y">Stepper Y</label>
+          <button class="lv_btn" name="YLeft" class="lv_btn">Left</button>
+          <button class="lv_btn" name="YRight" class="lv_btn">Right</button>
+        </div>
+
+        <!-- Stepper Z Labels -->
+        <div>
+          <label class="lv_label" for="z">Stepper Z</label>
+          <button class="lv_btn" name="ZLeft" class="lv_btn">Left</button>
+          <button class="lv_btn" name="ZRight" class="lv_btn">Right</button>
+        </div>
+
+        <!-- Enable Label -->
+        <div>
+          <label class="lv_label" for="enabled">Enabled</label>
+          <button class="lv_btn" name="OnOff" class="lv_btn">On</button> <!-- "On" Button ohne margin-left -->
+        </div>
+      </div>
+
+      <!-- Slider für Steps und Geschwindigkeit -->
+      <div class="slider-group">
+        <label class="lv_label" for="v">Steps</label>
+        <input type="range" class="slider" id="steps" name="Steps" min="1" max="100" value="20">
+      </div>
+      
+      <div class="slider-group">
+        <label class="lv_label" for="v">Speed</label>
+        <input type="range" class="slider" id="speed" name="Speed" min="0" max="100" value="20">
+      </div>
+    </div>
+    
+    <script>
+      document.querySelectorAll('.lv_btn').forEach(button => {
+        button.addEventListener('click', function() {
+          const name = this.getAttribute('name');
+          
+          fetch(`/button?name=${name}`, { method: 'GET'})
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
+          .then(data => {
+            console.log(data);
+            if (name === 'OnOff') {
+              document.querySelector(`[name='${name}']`).textContent = data;
+            }            
+          })
+          .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+          });
+        });
+      });
+      
+      document.querySelectorAll('.slider').forEach(slider => {
+        slider.addEventListener('change', function() {
+          const name = this.getAttribute('name');
+          const value = this.value;
+          
+          fetch(`/button?name=${name}&value=${value}`, { method: 'GET'})
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.text();
+          })
+          .then(data => {
+            console.log(data);
+          })
+          .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+          });
+        });
+      });      
+    </script>
+    
+  </body>
+</html>

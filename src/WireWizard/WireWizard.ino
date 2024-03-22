@@ -44,11 +44,10 @@ void setup()
   disableCore1WDT();
 
   SPI.begin();
-  SPIFFS.begin();
 
-  display.init();
+  display.begin();
 
-  motors.init();
+  motors.begin();
   motors.enable(true);
   // motors.beep(100);
 
@@ -86,7 +85,5 @@ void loop()
     }
   }
 
-  webServer.handleClient();
-  
   delay(100);
 }

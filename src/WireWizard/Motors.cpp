@@ -44,16 +44,33 @@ Motors::Motors()
   reset();
 }
 
+void Motors::enable(bool en)       
+{ 
+  enabled = en; 
+  if (!enabled){
+    resetSteps(); 
+  }
+}
+
 void Motors::reset()
 {
-  enabled  = false;
-  currPosX = 0;
-  currPosY = 0;
-  currPosZ = 0;
+  enabled       = false;
+  enabledOnIdle = false;
+  currPosX      = 0;
+  currPosY      = 0;
+  currPosZ      = 0;
+  doStepsX      = 0;
+  doStepsY      = 0;
+  doStepsZ      = 0;
+  delayUs       = 0;
+  beepMs        = 0;
+}
+
+void Motors::resetSteps()
+{
   doStepsX = 0;
   doStepsY = 0;
   doStepsZ = 0;
-  delayUs  = 0;
   beepMs   = 0;
 }
 
@@ -114,7 +131,11 @@ void Motors::motorTask(void *parg)
     motors->serialOut(0b00000001);
     while (true) {
       if ((!motors->enabled && motors->isIdleBeep()) || (motors->isIdleX() && motors->isIdleY() &&motors->isIdleZ())) {
-        motors->serialOut(0b00000001);
+        if (motors->enabledOnIdle) {
+          motors->serialOut(0b00000000);
+        } else {
+          motors->serialOut(0b00000001);
+        }
         vTaskDelay(pdMS_TO_TICKS(1));
         startTickCount = xTaskGetTickCount();
       } else {
@@ -146,11 +167,11 @@ void Motors::motorTask(void *parg)
   }
 }
 
-void Motors::init()
+void Motors::begin()
 {
   pinMode(latchPin, OUTPUT);
   pinMode(clockPin, OUTPUT);
   pinMode(dataPin, OUTPUT);
 
-  xTaskCreatePinnedToCore(motorTask, "motorTask", 10000, this, 1, NULL, 0);
+  xTaskCreatePinnedToCore(motorTask, "motorTask", 10000, this, 1, nullptr, 0);
 }

@@ -237,7 +237,7 @@ IRAM_ATTR void Display::displayTask(void *parg)
   }
 }
 
-void Display::init()
+void Display::begin()
 {
   pinMode(LCD_EN, OUTPUT);
     

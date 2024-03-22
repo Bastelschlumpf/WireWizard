@@ -26,6 +26,7 @@ class Motors
 {
 private:
   bool enabled;
+  bool enabledOnIdle;
   long currPosX;
   long currPosY;
   long currPosZ;
@@ -47,26 +48,29 @@ private:
 public:
   Motors();
 
-  void init();
+  void begin();
 
   void reset();
+  void resetSteps();
 
-  bool isIdleX()        { return doStepsX == 0; }
-  bool isIdleY()        { return doStepsY == 0; }
-  bool isIdleZ()        { return doStepsZ == 0; }
-  bool isIdleBeep()     { return beepMs   == 0; }
+  void enable(bool en);
+  bool isEnabled()           { return enabled;       }
 
-  bool isEnabled()      { return enabled;       }
-  void enable(bool en)  { enabled = en;         }
+  bool isIdleX()             { return doStepsX == 0; }
+  bool isIdleY()             { return doStepsY == 0; }
+  bool isIdleZ()             { return doStepsZ == 0; }
+  bool isIdleBeep()          { return beepMs   == 0; }
 
-  long getPosX()        { return currPosX;      }
-  long getPosY()        { return currPosY;      }
-  long getPosZ()        { return currPosZ;      }
-  void stepX(int steps) { if (enabled) doStepsX += steps; }
-  void stepY(int steps) { if (enabled) doStepsY += steps; }
-  void stepZ(int steps) { if (enabled) doStepsZ += steps; }
+  void enableOnIdle(bool en) { enabledOnIdle = en;   }
 
-  void delay(int us)    { delayUs = us;         }
+  long getPosX()             { return currPosX;      }
+  long getPosY()             { return currPosY;      }
+  long getPosZ()             { return currPosZ;      }
+  void stepX(int steps)      { if (enabled) doStepsX += steps; }
+  void stepY(int steps)      { if (enabled) doStepsY += steps; }
+  void stepZ(int steps)      { if (enabled) doStepsZ += steps; }
 
-  void beep(int ms)     { beepMs = ms;          }
+  void delay(int us)         { delayUs = us;         }
+
+  void beep(int ms)          { beepMs = ms;          }
 };

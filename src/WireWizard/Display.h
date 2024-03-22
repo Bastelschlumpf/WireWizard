@@ -65,5 +65,5 @@ private:
 public: 
   Display();
 
-  void init();
+  void begin();
 };

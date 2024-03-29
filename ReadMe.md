@@ -29,3 +29,7 @@ TFT_eSPI Library
   #define SPI_FREQUENCY  40000000  
   #define SPI_TOUCH_FREQUENCY  2000000  
 
+### Special thanks to
+
+**betaone for the universal housing with cover on thingiverse  
+https://www.thingiverse.com/thing:1701426**

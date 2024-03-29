@@ -1,6 +1,10 @@
+# WireWizard "Under Construction"
 
  ![WebInterface](images/WebInterface.png "WebInterface")
 
+ ![](images/HousingBlender.png)
+ ![](images/Housing3DPrint1.jpg)
+ ![](images/Housing3DPrint2.jpg)
 
 lvgl Library
   Version 9.0.0

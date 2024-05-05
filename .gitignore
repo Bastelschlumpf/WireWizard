@@ -6,5 +6,7 @@
 .git
 .vs
 *.user
+_Old
+**.blend1
 
 temp

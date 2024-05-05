@@ -1,0 +1,20 @@
+
+ToDo
+====
+
+- Abklären ob Grosse oder kleine Stepper
+  - Mit richtiger Spannung Drehmoment messen
+
+- Halter
+  - Die Messerschraube wird sich lösen
+
+- Steuerbox
+  - 25 Pol Stecker unterbringen
+
+- Kabelschneider Box
+  - Was machen wir mit den Kabeln
+  - Deckel, evtl. mit Plexiglaseinsatz und Schnallen
+  - Tube auf 1cm vergrössern
+
+- Stepper und Halter nochmals prüfen und dann in letzte Version einbauen
+

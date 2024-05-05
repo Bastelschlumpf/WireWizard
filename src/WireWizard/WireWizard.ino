@@ -28,13 +28,16 @@
 
 #include <SPI.h>
 #include "EventQueue.h"
+#include "Sensors.h"
 #include "Motors.h"
 #include "Display.h"
 #include "WebServer.h"
 
+Sensors     sensors;
 Motors      motors;
 Display     display;
 MyWebServer webServer;
+
 
 void setup() 
 {
@@ -47,6 +50,7 @@ void setup()
 
   display.begin();
 
+  sensors.begin();
   motors.begin();
   motors.enable(true);
   // motors.beep(100);
@@ -82,6 +86,17 @@ void loop()
         motors.delay(MAX_DELAY * (100.0 - event.speed) / 100.0); 
         break;
       }
+    }
+  }
+
+  static int ms = millis();
+  if (millis() - ms > 100) {
+    ms = millis();
+    
+    int xValue = sensors.getX();
+    Serial.println("Lichtschranke: " + String(xValue));
+    if (xValue > 2500) {
+      motors.stepX(1000);
     }
   }
 

@@ -56,6 +56,7 @@ public:
   void enable(bool en);
   bool isEnabled()           { return enabled;       }
 
+  bool isIdle()              { return isIdleX() && isIdleY() && isIdleZ(); }
   bool isIdleX()             { return doStepsX == 0; }
   bool isIdleY()             { return doStepsY == 0; }
   bool isIdleZ()             { return doStepsZ == 0; }

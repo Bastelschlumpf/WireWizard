@@ -26,15 +26,18 @@
   #include "ConfigOverride.h"
 #endif
 
+#include <Arduino.h>
 #include <SPI.h>
 #include "EventQueue.h"
 #include "Sensors.h"
 #include "Motors.h"
+#include "Controller.h"
 #include "Display.h"
 #include "WebServer.h"
 
-Sensors     sensors;
 Motors      motors;
+Sensors     sensors;
+Controller  controller(motors, sensors);
 Display     display;
 MyWebServer webServer;
 
@@ -48,18 +51,104 @@ void setup()
 
   SPI.begin();
 
+  motors.begin();
+  motors.delay(0);
+  motors.enable(true);
+  motors.enableOnIdle(false);
+  sensors.begin();
+  controller.begin();
   display.begin();
 
-  sensors.begin();
-  motors.begin();
-  motors.enable(true);
-  // motors.beep(100);
-
-  webServer.begin();
+  // webServer.begin();
 }
 
 #define MAX_DELAY 1000
 #define MAX_STEPS 10 * 16 * 200
+
+void testCut()
+{
+  int ticks = millis();
+
+  motors.beep(100);
+  motors.delay(1000);
+
+  Serial.println("Fill in");
+  ticks = millis();
+  motors.stepX(-100000);
+  Serial.println("Wait for cutter sensor");
+  while (sensors.getY() < 3000) {
+    delay(100);
+    if (millis() - ticks > 5000) {
+      break;
+      // return;
+    }
+  };
+  motors.resetSteps();
+
+  Serial.println("Move forward");
+  ticks = millis();
+  motors.stepX(-100000);
+  motors.stepZ(-100000);
+  Serial.println("Wait for out sensor");
+  while (sensors.getZ() < 3000) {
+    delay(100);
+    if (millis() - ticks > 5000) {
+      break;
+      // return;
+    }
+  };
+  motors.resetSteps();
+
+  Serial.println("Move a bit forward");
+  ticks = millis();
+  motors.stepX(-3000);
+  motors.stepZ(-3000);
+  while (!motors.isIdle()) {
+    delay(100);
+    if (millis() - ticks > 5000) {
+      break;
+      // return;
+    }
+  }
+  motors.resetSteps();
+
+  Serial.println("Cut");
+  ticks = millis();
+  motors.stepY(4000);
+  while (!motors.isIdle()) {
+    delay(100);
+    if (millis() - ticks > 5000) {
+      break;
+      // return;
+    }
+  }
+  ticks = millis();
+  motors.stepY(-4000);
+  while (!motors.isIdle()) {
+    delay(100);
+    if (millis() - ticks > 5000) {
+      break;
+      // return;
+    }
+  }
+
+  Serial.println("Move out");
+  ticks = millis();
+  motors.stepZ(-200000);
+  Serial.println("Wait for out");
+  while (sensors.getZ() > 3000) {
+    delay(100);
+    if (millis() - ticks > 5000) {
+      break;
+      // return;
+    }
+  };
+
+  motors.beep(100);
+  motors.resetSteps();
+
+  Serial.println("Finish");
+}
 
 void loop() 
 {
@@ -85,20 +174,31 @@ void loop()
       case Event::SPEED:  
         motors.delay(MAX_DELAY * (100.0 - event.speed) / 100.0); 
         break;
+      case Event::START:  
+        controller.move(100);
+        controller.cut();
+        controller.eject(100);
+        break;
       }
     }
   }
 
-  static int ms = millis();
-  if (millis() - ms > 100) {
-    ms = millis();
-    
-    int xValue = sensors.getX();
-    Serial.println("Lichtschranke: " + String(xValue));
-    if (xValue > 2500) {
-      motors.stepX(1000);
-    }
+  int valueX = sensors.getX();
+  int valueY = sensors.getY();
+  int valueZ = sensors.getZ();
+
+  display.setValueX("X: " + String(valueX));
+  display.setValueY("Y: " + String(valueY));
+  display.setValueZ("Z: " + String(valueZ));
+
+  // Serial.println("Lichtschranke (X, Y, Z): " + String(valueX) + ", " + String(valueY) + ", " + String(valueZ));
+
+/*
+  if (valueX > 3000) {
+    Serial.println("In sensor");
+    testCut();
   }
+  */
 
   delay(100);
 }

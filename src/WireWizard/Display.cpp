@@ -44,6 +44,10 @@ Display *Display::display = NULL;
 Display::Display()
 {
   display = this;
+
+  valueX  = "x";
+  valueY  = "y";
+  valueZ  = "z";
 }
 
 void Display::displayFlush(lv_disp_drv_t *disp, const lv_area_t *area, lv_color_t *color_p)
@@ -93,6 +97,7 @@ void Display::buttonEvent(lv_obj_t *button, lv_event_t event)
     else if (button == Display::display->buttonYRight) event.pushButton = Event::Y_RIGHT;
     else if (button == Display::display->buttonZLeft)  event.pushButton = Event::Z_LEFT;
     else if (button == Display::display->buttonZRight) event.pushButton = Event::Z_RIGHT;
+    else if (button == Display::display->buttonStart)  event.pushButton = Event::START;
     else if (button == Display::display->buttonOnOff) {
       lv_obj_t *label = lv_obj_get_child(button, NULL);
 
@@ -139,17 +144,17 @@ void Display::initStyles()
 {
   // Stil für den aktivierten Button
   lv_style_copy(&style_btn_enabled, &lv_style_plain);
-  style_btn_enabled.body.main_color = LV_COLOR_GREEN;      // Hintergrundfarbe
-  style_btn_enabled.body.grad_color = LV_COLOR_GREEN;      // Hintergrundfarbe (Gradient)
+  style_btn_enabled.body.main_color   = LV_COLOR_GREEN;    // Hintergrundfarbe
+  style_btn_enabled.body.grad_color   = LV_COLOR_GREEN;    // Hintergrundfarbe (Gradient)
   style_btn_enabled.body.border.color = LV_COLOR_WHITE;    // Randfarbe
-  style_btn_enabled.text.color = LV_COLOR_WHITE;           // Textfarbe
+  style_btn_enabled.text.color        = LV_COLOR_WHITE;    // Textfarbe
 
   // Stil für den deaktivierten Button
   lv_style_copy(&style_btn_disabled, &lv_style_plain);
-  style_btn_disabled.body.main_color = LV_COLOR_GRAY;       // Hintergrundfarbe
-  style_btn_disabled.body.grad_color = LV_COLOR_GRAY;       // Hintergrundfarbe (Gradient)
-  style_btn_disabled.body.border.color = LV_COLOR_WHITE;    // Randfarbe
-  style_btn_disabled.text.color = LV_COLOR_WHITE;
+  style_btn_disabled.body.main_color   = LV_COLOR_GRAY;    // Hintergrundfarbe
+  style_btn_disabled.body.grad_color   = LV_COLOR_GRAY;    // Hintergrundfarbe (Gradient)
+  style_btn_disabled.body.border.color = LV_COLOR_WHITE;   // Randfarbe
+  style_btn_disabled.text.color        = LV_COLOR_WHITE;   // Textfarbe
 }
 
 lv_obj_t *Display::createLabel(int16_t posX, int16_t posY, String text)
@@ -159,6 +164,11 @@ lv_obj_t *Display::createLabel(int16_t posX, int16_t posY, String text)
   lv_label_set_text(label, text.c_str());
   lv_obj_align(label, NULL, LV_ALIGN_IN_TOP_LEFT, posX, posY);
   return label;
+}
+
+void Display::setLabelText(lv_obj_t *label, String text)
+{
+  lv_label_set_text(label, text.c_str());
 }
 
 lv_obj_t *Display::createButton(int16_t posX, int16_t posY, int16_t sizeX, int16_t sizeY, String text)
@@ -210,9 +220,9 @@ IRAM_ATTR void Display::displayTask(void *parg)
   if (display) {
     display->initStyles();
 
-    display->createLabel( 30, 30, "Stepper X");
-    display->createLabel(120, 30, "Stepper Y");
-    display->createLabel(210, 30, "Stepper Z");
+    display->createLabel( 60, 30, "In");
+    display->createLabel(140, 30, "Cut");
+    display->createLabel(230, 30, "Out");
 
     display->buttonXLeft  = display->createButton(  30,  60, 70, 50, "Left");
     display->buttonXRight = display->createButton(  30, 120, 70, 50, "Right");
@@ -225,12 +235,22 @@ IRAM_ATTR void Display::displayTask(void *parg)
     display->buttonOnOff = display->createButton( 315,  60, 70, 50, "On");
 
     display->createLabel (40, 200, "Steps");
-    display->sliderSteps = display->createSlider(120, 190, 280, 40, 1, 100, 20);
+    display->sliderSteps = display->createSlider(120, 190, 180, 40, 1, 100, 20);
 
     display->createLabel (40, 250, "Speed");
-    display->sliderSpeed = display->createSlider(120, 240, 280, 40, 0, 100, 20);
+    display->sliderSpeed = display->createSlider(120, 240, 180, 40, 0, 100, 20);
+
+    display->buttonStart = display->createButton( 320, 210, 70, 50, "Start");
+
+    lv_obj_t *labelX = display->createLabel(320, 120, display->valueX);
+    lv_obj_t *labelY = display->createLabel(320, 140, display->valueY);
+    lv_obj_t *labelZ = display->createLabel(320, 160, display->valueZ);
 
     while (1) {
+      display->setLabelText(labelX, display->valueX);
+      display->setLabelText(labelY, display->valueY);
+      display->setLabelText(labelZ, display->valueZ);
+
       lv_task_handler();
       vTaskDelay(5);
     }

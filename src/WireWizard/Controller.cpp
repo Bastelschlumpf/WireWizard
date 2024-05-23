@@ -14,41 +14,56 @@
    You should have received a copy of the GNU General Public License
    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
-#pragma once
-
-#include <Arduino.h>
-#include "driver/gpio.h"
-#include "driver/adc.h"
-
 /**
-  * @file Sensors.ino
+  * @file Controller.cpp
   * 
-  * Sensor file
+  * Implementation of cutter controller class
   */
 
-#define SENSOR_X GPIO_NUM_34
-#define SENSOR_Y GPIO_NUM_35
-#define SENSOR_Z GPIO_NUM_36
+#include "Controller.h"  
 
-class Sensors
+
+void Controller::begin()
 {
-public:
-  void begin()
-  {
-  }
+}
+
+void Controller::move(double mm)
+{
+  motors.beep(100);
   
-  int getX()
-  {
-    return analogRead(SENSOR_X);
+  motors.stepX(-mm * STEPS_PER_MM);
+  motors.stepZ(-mm * STEPS_PER_MM);
+
+  while (!motors.isIdle()) {
+    delay(10);
   }
+  motors.beep(100);
+}
+
+void Controller::eject(double mm)
+{
+  motors.beep(100);
   
-  int getY()
-  {
-    return analogRead(SENSOR_Y);
+  motors.stepZ(-mm * STEPS_PER_MM);
+
+  while (!motors.isIdle()) {
+    delay(10);
   }
-  
-  int getZ()
-  {
-    return analogRead(SENSOR_Z);
+  motors.beep(100);
+}
+
+void Controller::cut()
+{
+  motors.beep(100);
+
+  motors.stepY(4000);
+  while (!motors.isIdle()) {
+    delay(10);
   }
-};
+  motors.stepY(-4000);
+  while (!motors.isIdle()) {
+    delay(10);
+  }
+  motors.beep(100);
+}
+

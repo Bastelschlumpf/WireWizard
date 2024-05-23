@@ -17,38 +17,34 @@
 #pragma once
 
 #include <Arduino.h>
-#include "driver/gpio.h"
-#include "driver/adc.h"
+#include "Sensors.h"
+#include "Motors.h"
 
 /**
-  * @file Sensors.ino
+  * @file Controller.h
   * 
-  * Sensor file
+  * Implementation of the cutter controller class
   */
 
-#define SENSOR_X GPIO_NUM_34
-#define SENSOR_Y GPIO_NUM_35
-#define SENSOR_Z GPIO_NUM_36
+#define STEPS_PER_MM ((double) 10000 / 260)
 
-class Sensors
+
+class Controller
 {
+private:
+  Motors  &motors;
+  Sensors &sensors;
+
 public:
-  void begin()
+  Controller(Motors &m, Sensors &s)
+    : motors(m)
+    , sensors(s)
   {
   }
-  
-  int getX()
-  {
-    return analogRead(SENSOR_X);
-  }
-  
-  int getY()
-  {
-    return analogRead(SENSOR_Y);
-  }
-  
-  int getZ()
-  {
-    return analogRead(SENSOR_Z);
-  }
+
+  void begin();
+
+  void move(double mm);
+  void eject(double mm);
+  void cut();
 };

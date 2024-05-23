@@ -31,6 +31,10 @@ class Display
 private:
   static Display *display;  
 
+  String valueX;
+  String valueY;
+  String valueZ;
+
 private:
   static IRAM_ATTR void displayTask(void *parg);
 
@@ -55,15 +59,23 @@ private:
   lv_obj_t *buttonYRight = NULL;
   lv_obj_t *buttonZLeft  = NULL;
   lv_obj_t *buttonZRight = NULL;
+  lv_obj_t *buttonStart  = NULL;
 
 private:
   void      initStyles();
-  lv_obj_t *createLabel(int16_t posX, int16_t posY, String text);
+
+  lv_obj_t *createLabel  (int16_t posX, int16_t posY, String text);
   lv_obj_t *createButton (int16_t posX, int16_t posY, int16_t sizeX, int16_t sizeY, String text);
-  lv_obj_t *createSlider(int16_t posX, int16_t posY, int16_t sizeX, int16_t sizeY, int min, int max, int standard);
+  lv_obj_t *createSlider (int16_t posX, int16_t posY, int16_t sizeX, int16_t sizeY, int min, int max, int standard);
+
+  void      setLabelText (lv_obj_t *label, String text);
 
 public: 
   Display();
+
+  void setValueX(String x) { valueX = x; };
+  void setValueY(String y) { valueY = y; };
+  void setValueZ(String z) { valueZ = z; };
 
   void begin();
 };

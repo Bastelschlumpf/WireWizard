@@ -31,7 +31,7 @@ class Event
 public:
   enum PushButton { 
     X_LEFT, X_RIGHT, Y_LEFT, Y_RIGHT, Z_LEFT, Z_RIGHT, 
-    ON, OFF, STEPS, SPEED 
+    ON, OFF, STEPS, SPEED, START
   };
 
 public:
